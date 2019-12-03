@@ -59,10 +59,7 @@ let points_in_path path =
 module Point = struct
   module T = struct
     type t = int * int
-    let compare (x0, y0) (x1, y1) = 
-      match Stdlib.compare x0 x1 with
-      | 0 -> Stdlib.compare y0 y1
-      | c -> c
+    let compare = Stdlib.compare
     let sexp_of_t (x, y) : Sexp.t =
       List [Atom (Int.to_string x); Atom (Int.to_string y)]
   end
