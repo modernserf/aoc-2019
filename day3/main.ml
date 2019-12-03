@@ -56,20 +56,22 @@ let points_in_path path =
         | _ -> raise NoOriginProvided) 
   |> List.rev
 
-(* yiiiiikes *)
-let encode (x, y) = String.concat ~sep:"," [Int.to_string x; Int.to_string y] 
-let decode value = 
-  let parts = String.split_on_chars ~on:[','] value in
-  let x = List.nth_exn parts 0 in
-  let y = List.nth_exn parts 1 in  
-  (Int.of_string x, Int.of_string y)
-let set_of list =
-  Set.of_list (module String) (List.map ~f:encode list)
+module Point = struct
+  module T = struct
+    type t = int * int
+    let compare (x0, y0) (x1, y1) = 
+      match Stdlib.compare x0 x1 with
+      | 0 -> Stdlib.compare y0 y1
+      | c -> c
+    let sexp_of_t (x, y) : Sexp.t =
+      List [Atom (Int.to_string x); Atom (Int.to_string y)]
+  end
+  include T
+  include Comparator.Make(T)
+end
 
 let intersect_list l r =
-(Set.inter (set_of l) (set_of r))
-  |> Set.to_list
-  |> List.map ~f:decode
+  Set.to_list (Set.inter (Set.of_list (module Point) l) (Set.of_list (module Point) r))
 
 exception NotFound
 let rec find_index list item i =
