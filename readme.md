@@ -7,5 +7,4 @@
 
 - [Haskell, 2018 (unfinished)](https://github.com/modernserf/aoc-2018)
 - [Rust, 2017](https://github.com/modernserf/aoc-2017)
-- [Forth, 2016 (unfinished)](https://github.com/modernserf/advent-of-code)
-- I did 2016 in Prolog as well (in the summer of 2017) and I _think_ I finished it, but I have no idea where that code is
+- [Forth & Prolog, 2016 (unfinished)](https://github.com/modernserf/advent-of-code)
