@@ -18,15 +18,24 @@ let rec has_digit_pair ?(state=0) digits =
   | [] -> false
   | (hd :: tl) -> (state = hd) || (has_digit_pair ~state:hd tl)
 
-let rec has_only_digit_pair ?(state=(0,0)) digits =
-  let (digit, repeat_count) = state in
-  match digits with
-  | [] -> repeat_count = 2
-  | (hd :: tl) -> 
-    if hd <> digit && repeat_count = 2 then true else
-    if hd = digit then has_only_digit_pair ~state:(hd, repeat_count + 1) tl else
-    has_only_digit_pair ~state:(hd, 1) tl
+type digitPairState =
+  | Init
+  | OneDigit of int
+  | TwoDigit of int
+  | MoreDigit of int
 
+let next_digit state digit =
+  let open Continue_or_stop in
+  match state with
+  | Init -> Continue (OneDigit digit)
+  | OneDigit prev -> if digit = prev then Continue (TwoDigit digit) else Continue (OneDigit digit)
+  | TwoDigit prev -> if digit = prev then Continue (MoreDigit digit) else Stop (TwoDigit digit)
+  | MoreDigit prev -> if digit = prev then Continue (MoreDigit digit) else Continue (OneDigit digit)
+
+let has_only_digit_pair digits =
+  match List.fold_until ~f:next_digit ~init:Init ~finish:ident digits with
+  | TwoDigit _ -> true
+  | _ -> false
 
 let rec range ?(state=[]) min max =
   if min = max then state else
