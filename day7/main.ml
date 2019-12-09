@@ -1,6 +1,5 @@
 open Core
 
-
 let read_input filename = 
   filename
   |> In_channel.read_all
@@ -150,18 +149,15 @@ let execute_one state =
   | Halt -> 
     Stop state
 
-
 let rec execute state =
   match execute_one state with
   | Continue next_state -> execute next_state
   | Stop next_state -> next_state.output
   | Yield next_state -> next_state.output
 
-
 let execute_cluster program input =
   let mem = List.to_array program in
   execute { mem; index = 0; input; output = []; initial_phase = 0 }
-
 
 let append_input next_state input = {
   next_state with 
@@ -171,7 +167,6 @@ let append_input next_state input = {
 let pair_exn list = 
   (List.hd_exn list, List.tl_exn list)
 
- 
 let rec execute_cluster_feedback_loop (states : node_state list) : int list =
   let (state, rest_states) = pair_exn states in
   match execute_one state with
@@ -189,7 +184,6 @@ let rec execute_cluster_feedback_loop (states : node_state list) : int list =
     let next_state_with_prev_output = append_input next_state yield_state.output in
     let next_tail = List.append tail [{ yield_state with output = [] }] in
     execute_cluster_feedback_loop (next_state_with_prev_output :: next_tail)
-
 
 let execute_cluster_feedback (program : int list) (input : int list) : int =
   let (first, rest) = pair_exn (List.map ~f:(init_node_state program) input) in 
@@ -215,7 +209,6 @@ let rec permutations lst =
   | hd::tl -> List.concat (List.map ~f:(interleave hd) (permutations tl))
   | _ -> [lst]
 
-
 let rec max_list ?(state=0) list =
   match list with
   | [] -> state
@@ -236,4 +229,3 @@ let () =
   let inputs = permutations [5;6;7;8;9] in
   let results = List.map ~f:(execute_cluster_feedback program) inputs in
   printf "Part 2: %d\n" (max_list results);
-
